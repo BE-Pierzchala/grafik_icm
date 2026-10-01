@@ -1,0 +1,64 @@
+# Configuration for importing the IO 2026Z timetable into Google Calendar.
+
+excel_file = "grafik.xlsx"
+plan_sheet = "plan_2026Z"
+legend_sheet = "legenda_2026Z"
+# The semester is a required command-line argument: python main.py 1|2|3
+# "{semester}" below is replaced with that number.
+semester_header = "SEMESTR {semester}"   # header text of the column block to import
+timezone = "Europe/Warsaw"
+
+# Calendar target. If calendar_name is set, a dedicated calendar with that name
+# is found or created (recommended: easy to hide or delete as a whole).
+# Leave it empty ("") to use calendar_id instead (e.g. "primary").
+# Keep "{semester}" in the name so each semester gets its own calendar.
+calendar_name = "IO 2026Z – Semestr {semester}"
+calendar_id = "primary"
+
+# Tag stored on every created event; used for safe re-runs, --prune and --delete-all.
+# Must contain "{semester}", otherwise --prune for one semester would delete another's events.
+source_tag = "plan_IO_2026Z_sem{semester}"
+
+# Location text. "{room}" is replaced with the value from the "sala" column.
+# Rooms containing "on-line" get location "on-line" instead.
+location_template = "ICM UW, ul. Pawińskiego 5a, piętro V ({room})"
+
+# Notices spanning all semester columns (Dzień rektorski, inauguracja, przerwa
+# świąteczna...). true = add them as events in their own colour.
+include_notices = true
+
+# Subject codes (as written in the plan) to skip, e.g. electives you did not pick.
+# Applies to whichever semester you run; electives appear in all three columns.
+# exclude = ["CYBa-30", "ATSa-30"]
+exclude = ["CYBa-30", "PDSa", "PROJ-OG"]
+
+# Colour assignment: "excel" = nearest Google colour to the cell colour in the
+# spreadsheet (each subject gets a distinct colour while possible);
+# "sequential" = colours 1..11 in order of first appearance.
+color_strategy = "excel"
+
+# Manual colour overrides, code -> Google colorId (1..11):
+# 1 Lavender, 2 Sage, 3 Grape, 4 Flamingo, 5 Banana, 6 Tangerine,
+# 7 Peacock, 8 Graphite, 9 Blueberry, 10 Basil, 11 Tomato
+[colors]
+# "MAMa" = "6"
+
+# Full names for codes whose name is missing or wrong in the legend sheet.
+# The legend has NO full name for: WSOa, NLPa-30, PDSa, ATSa-30
+# (those are imported under their short code until you fill them in here).
+# The legend title for CYBa-30 looks corrupted ("Podstawy CYBa-30erbezpieczeństwa");
+# the likely intended name is below – uncomment after verifying.
+[titles]
+ "CYBa-30" = "Podstawy cyberbezpieczeństwa"
+# "WSOa" = "..."
+
+# Corrections for rows whose date does not fit their week block.
+# Key = Excel row number of the FIRST row of that day (column A), value = correct date.
+# Dates are shared by all semester columns, so a fix applies to every semester.
+# Rows flagged as anomalies are SKIPPED unless corrected here.
+# Detected in the current file (suggestions are inferences from the weekday order – verify!):
+#   row 286: 2026-12-04 in week 11 (after Thu 2026-12-10) – probably Fri 2026-12-11
+#   row 313: 2027-01-18 in week 12 (after Thu 2026-12-17) – probably Fri 2026-12-18
+[date_fixes]
+ 286 = "2026-12-11"
+ 313 = "2026-12-18"
